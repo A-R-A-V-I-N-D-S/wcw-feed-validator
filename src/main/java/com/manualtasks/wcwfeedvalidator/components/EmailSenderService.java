@@ -1,9 +1,10 @@
 package com.manualtasks.wcwfeedvalidator.components;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
 
@@ -43,8 +44,8 @@ public class EmailSenderService {
 		try {
 			Template template = configuration.getTemplate("success-email.ftl");
 			String processedText = FreeMarkerTemplateUtils.processTemplateIntoString(template, null);
-			MimeMessageHelper helper = new MimeMessageHelper(emailMessage, MimeMessageHelper.MULTIPART_MODE_NO,
-					StandardCharsets.UTF_8.name());
+			MimeMessageHelper helper = new MimeMessageHelper(emailMessage,
+					MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
 			helper.setFrom(mailFrom);
 			helper.setTo(mailTo);
 			helper.setSubject("TEST - WCW Cert file status - " + dateFormat.format(new Date()));
@@ -63,8 +64,10 @@ public class EmailSenderService {
 	public void sendFailureStatusEmail() {
 		MimeMessage emailMessage = emailSender.createMimeMessage();
 		try {
-			Template template = configuration.getTemplate("failure-email.ftl");
-			String processedText = FreeMarkerTemplateUtils.processTemplateIntoString(template, null);
+			Map<String, Object> model = new HashMap<>();
+			model.put("text", "not ready to process");
+			Template template = configuration.getTemplate("failure-email.html");
+			String processedText = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 			MimeMessageHelper helper = new MimeMessageHelper(emailMessage, MimeMessageHelper.MULTIPART_MODE_NO,
 					StandardCharsets.UTF_8.name());
 			helper.setFrom(mailFrom);

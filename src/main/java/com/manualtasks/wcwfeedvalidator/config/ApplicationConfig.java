@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,12 +18,12 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 @Configuration
+@Lazy
 public class ApplicationConfig {
 
 	private static Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
 	@Bean
-	@DependsOn
 	public ChannelSftp connectSftp(String batchServer, String userName, String password) throws JSchException {
 		Session session = new JSch().getSession(userName, batchServer, 22);
 		session.setPassword(password);
@@ -36,7 +37,6 @@ public class ApplicationConfig {
 		return sftpChannel;
 	}
 
-	@Bean
 	public void disconnectSftp(ChannelSftp sftpChannel) throws JSchException {
 		Session session = sftpChannel.getSession();
 		if (sftpChannel != null && sftpChannel.isConnected()) {

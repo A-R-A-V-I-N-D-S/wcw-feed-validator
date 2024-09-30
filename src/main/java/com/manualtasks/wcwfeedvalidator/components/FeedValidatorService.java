@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -23,8 +25,9 @@ import com.jcraft.jsch.SftpException;
 import com.manualtasks.wcwfeedvalidator.config.ApplicationConfig;
 import static com.manualtasks.wcwfeedvalidator.utils.ClassDataUtils.MODULE_NAMES_LIST;
 
-@Component
-public class WcwCertFeedValidationTasklet {
+@Service
+@Lazy
+public class FeedValidatorService {
 
 	@Value("${batch.server.username}")
 	private String username;
@@ -43,7 +46,7 @@ public class WcwCertFeedValidationTasklet {
 	@Autowired
 	private ApplicationConfig applicationConfig;
 
-	private static Logger logger = LoggerFactory.getLogger(WcwCertFeedValidationTasklet.class);
+	private static Logger logger = LoggerFactory.getLogger(FeedValidatorService.class);
 
 	public boolean validateWcwFeed() throws SftpException, IOException, JSchException {
 
@@ -58,6 +61,10 @@ public class WcwCertFeedValidationTasklet {
 				wcwFileName = fileName.toString();
 				break;
 			}
+		}
+
+		if (wcwFileName == "") {
+			return false;
 		}
 
 		InputStream inputStream = sftpChannel.get(filePath + wcwFileName);
