@@ -4,12 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -24,6 +21,7 @@ public class ApplicationConfig {
 	private static Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
 	@Bean
+	@Scope(value = "prototype")
 	public ChannelSftp connectSftp(String batchServer, String userName, String password) throws JSchException {
 		Session session = new JSch().getSession(userName, batchServer, 22);
 		session.setPassword(password);
@@ -54,18 +52,8 @@ public class ApplicationConfig {
 	@Primary
 	public FreeMarkerConfigurationFactoryBean factoryBean() {
 		FreeMarkerConfigurationFactoryBean theFactoryBean = new FreeMarkerConfigurationFactoryBean();
-		theFactoryBean.setTemplateLoaderPath("classpath:templates/");
+		theFactoryBean.setTemplateLoaderPath("classpath:templates");
 		return theFactoryBean;
 	}
-
-	@Bean
-	public JavaMailSender javaMailSender() {
-		return new JavaMailSenderImpl();
-	}
-
-//	@Bean
-//	public freemarker.template.Configuration configuration() {
-//
-//	}
 
 }

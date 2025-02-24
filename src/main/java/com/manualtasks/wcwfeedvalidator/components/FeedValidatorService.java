@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -41,53 +41,82 @@ public class FeedValidatorService {
 	private String filePath = "/usr/app/blcs/BrokerOversight/";
 
 	@Autowired
-	private ApplicationContext applicationContext;
-
-	@Autowired
 	private ApplicationConfig applicationConfig;
 
 	private static Logger logger = LoggerFactory.getLogger(FeedValidatorService.class);
 
-	public boolean validateWcwFeed() throws SftpException, IOException, JSchException {
+	public int validateWcwFeed() throws SftpException, IOException, JSchException {
 
-		logger.info("Validating WCW Cert file - START");
+		logger.info("Validating WCW Cert file in the server " + batchServer);
 
-		ChannelSftp sftpChannel = applicationContext.getBean(ChannelSftp.class, batchServer, username, password);
-//		ChannelSftp sftpChannel = applicationConfig.connectSftp(batchServer, username, password);
+//		ChannelSftp sftpChannel = applicationContext.getBean(ChannelSftp.class, batchServer, username, password);
+		ChannelSftp sftpChannel = applicationConfig.connectSftp(batchServer, username, password);
 		Vector<LsEntry> listOfFiles = sftpChannel.ls(filePath);
 		String wcwFileName = "";
+		String regexPattern = "^SBO_WCW_Certification_.*";
 		for (LsEntry fileName : listOfFiles) {
-			if (fileName.toString().contains("SBO_WCW_Certification_")) {
-				wcwFileName = fileName.toString();
+			String requiredFileName = fileName.toString().substring(56);
+			if (Pattern.matches(regexPattern, requiredFileName)) {
+				logger.info("File found is - {}", requiredFileName);
+				wcwFileName = requiredFileName;
 				break;
 			}
 		}
 
 		if (wcwFileName == "") {
-			return false;
+			applicationConfig.disconnectSftp(sftpChannel);
+			return 3;
 		}
 
 		InputStream inputStream = sftpChannel.get(filePath + wcwFileName);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		String line;
 		List<List<String>> wcwFeedRecordArray = new ArrayList<>();
+		int countOfQuotes;
 		while ((line = reader.readLine()) != null) {
+			countOfQuotes = StringUtils.countOccurrencesOf(line, "\"");
+			if (countOfQuotes % 2 != 0)
+				return 4;
 			wcwFeedRecordArray.add(Arrays.asList(line.split("\\|")));
 		}
+		reader.close();
+		inputStream.close();
 
 		applicationConfig.disconnectSftp(sftpChannel);
 
-		logger.info("Validating WCW Cert feed - END");
-
 		for (List<String> wcwFeedRecord : wcwFeedRecordArray) {
 			if (wcwFeedRecord.size() > 19) {
-				return false;
+				return 1;
 			}
-			if (!MODULE_NAMES_LIST.contains(wcwFeedRecord.get(12))) {
-				return false;
+			if (wcwFeedRecord.size() >= 19 && !MODULE_NAMES_LIST.contains(wcwFeedRecord.get(12))) {
+				return 2;
 			}
 		}
-		return true;
+
+		return 0;
+	}
+
+	public List<String> isFileMoved() throws JSchException, SftpException {
+		ChannelSftp sftpChannel = applicationConfig.connectSftp("dc04plvbuc300", username, password);
+		Vector<LsEntry> listOfFiles = sftpChannel.ls("/apps/ftp/sbofeed");
+		List<String> files = new ArrayList<>();
+		logger.info("Checking the presence of the file in the destination server.");
+		for (LsEntry entry : listOfFiles) {
+			if (entry.toString().substring(60).contains("SBO_WCW_Certification")) {
+				files.add(entry.toString().substring(60));
+			}
+			if (entry.toString().substring(60).contains("SBO_SBI_AgentType")) {
+				files.add(entry.toString().substring(60));
+			}
+			if (entry.toString().substring(60).contains("agentAgencyBOD")) {
+				files.add(entry.toString().substring(60));
+			}
+		}
+		applicationConfig.disconnectSftp(sftpChannel);
+		if (files.size() > 0) {
+			return files;
+		}
+		return null;
 	}
 
 }
