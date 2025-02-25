@@ -54,6 +54,7 @@ public class EmailSenderService {
 		logger.info("Initiating the process to send the status email");
 		MimeMessage emailMessage = emailSender.createMimeMessage();
 		try {
+			logger.info(filesList.toString());
 			Map<String, Object> model = new HashMap<>();
 			model.put("text", "ready to process");
 			model.put("isFaulty", "is valid");
@@ -68,7 +69,7 @@ public class EmailSenderService {
 			helper.setFrom(mailFrom);
 			helper.setTo(mailTo);
 			helper.setCc(mailCc);
-			helper.setSubject("WCW Cert file status " + currentDate + " - READY TO PROCESS");
+			helper.setSubject("WCW Cert file status " + currentDate + " - VALID");
 			helper.setText(processedText, true);
 
 			emailSender.send(emailMessage);

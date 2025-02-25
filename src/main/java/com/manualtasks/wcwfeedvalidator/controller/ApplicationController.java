@@ -78,7 +78,7 @@ public class ApplicationController {
 	public ResponseEntity<?> isFilePresentAtDestination() {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			List<String> filesList = validationService.isFileMoved();
+			filesList = validationService.isFileMoved();
 			if (filesList != null) {
 				response.put("timestamp", LocalDateTime.now().toString().replace('T', ' '));
 				response.put("success", "The file(s) are present in the destination server.");

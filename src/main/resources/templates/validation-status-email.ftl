@@ -83,7 +83,7 @@ div.WordSection1 {
 		<p class=MsoNormal>
 			<span style='mso-bookmark: _MailOriginal'><b><span
 					style='font-family: "Calibri", sans-serif; mso-bidi-font-family: "Times New Roman"; mso-bidi-theme-font: minor-bidi'>Files
-						in 300/301 Server sbofeed path:<o:p></o:p>
+						present in 300/301 Server:<o:p></o:p>
 				</span></b></span>
 		</p>
 
@@ -99,26 +99,14 @@ div.WordSection1 {
 				<td width=234 valign=top
 					style='width: 175.2pt; border: solid windowtext 1.0pt; mso-border-alt: solid windowtext .5pt; padding: 0in 5.4pt 0in 5.4pt'>
 					<p class=MsoNormal>
-						<span style='mso-bookmark: _MailOriginal'><b><span
-								style='font-family: "Calibri", sans-serif; mso-bidi-font-family: "Times New Roman"; mso-bidi-theme-font: minor-bidi'>${file}<o:p></o:p>
-							</span></b></span>
+						<span style='mso-bookmark: _MailOriginal'><span
+							style='font-family: "Calibri", sans-serif; mso-bidi-font-family: "Times New Roman"; mso-bidi-theme-font: minor-bidi'>${file}<o:p></o:p>
+						</span></span>
 					</p>
 				</td>
 				<span style='mso-bookmark: _MailOriginal'></span>
 			</tr>
 			</#list>
-			<!--<tr style='mso-yfti-irow: 1; mso-yfti-lastrow: yes'>
-				<td width=234 valign=top
-					style='width: 175.2pt; border: solid windowtext 1.0pt; border-top: none; mso-border-top-alt: solid windowtext .5pt; mso-border-alt: solid windowtext .5pt; padding: 0in 5.4pt 0in 5.4pt'>
-					<p class=MsoNormal>
-						<span style='mso-bookmark: _MailOriginal'><b><span
-								style='font-family: "Calibri", sans-serif; mso-bidi-font-family: "Times New Roman"; mso-bidi-theme-font: minor-bidi'>GLA
-									GLA<o:p></o:p>
-							</span></b></span>
-					</p>
-				</td>
-				<span style='mso-bookmark: _MailOriginal'></span>
-			</tr> -->
 		</table>
 		<p class="MsoNormal">
 			<span style="font-family: 'Calibri', sans-serif"><o:p>&nbsp;</o:p></span>

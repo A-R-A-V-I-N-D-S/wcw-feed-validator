@@ -102,13 +102,8 @@ public class FeedValidatorService {
 		List<String> files = new ArrayList<>();
 		logger.info("Checking the presence of the file in the destination server.");
 		for (LsEntry entry : listOfFiles) {
-			if (entry.toString().substring(60).contains("SBO_WCW_Certification")) {
-				files.add(entry.toString().substring(60));
-			}
-			if (entry.toString().substring(60).contains("SBO_SBI_AgentType")) {
-				files.add(entry.toString().substring(60));
-			}
-			if (entry.toString().substring(60).contains("agentAgencyBOD")) {
+			if (!(entry.toString().substring(60).length() < 3 && entry.toString().substring(60).equals("outbound")
+					&& entry.toString().substring(60).equals("backup"))) {
 				files.add(entry.toString().substring(60));
 			}
 		}
